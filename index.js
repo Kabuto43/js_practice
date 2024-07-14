@@ -1,6 +1,6 @@
 let activeTabId = 'goods'
 
-const initialTab = document.querySelector(`button[data-tab-id="${activeTabId}"]`)
+const initialTab = getActiveTab()
 
 initialTab.classList.add('active')
 
@@ -13,10 +13,14 @@ for (let i = 0; i < tabs.length; i++) {
 }
 
 function clickHandler(event) {
-    const activeTab = document.querySelector(`button[data-tab-id="${activeTabId}"]`)
+    const activeTab = getActiveTab()
     
     activeTab.classList.remove('active')
     event.target.classList.add('active')
 
     activeTabId = event.target.dataset.tabId
+}
+
+function getActiveTab () {
+    return document.querySelector(`button[data-tab-id="${activeTabId}"]`)
 }
