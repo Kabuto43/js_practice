@@ -13,6 +13,10 @@ body {
 	);
 }
 
+.none {
+	display: none;
+}
+
 .tabs {
 	display: flex;
 	align-items: center;
@@ -37,7 +41,7 @@ body {
 }
 
 .cart-tab::after {
-	content: '5';
+	content: attr(data-goods-count);
 	display: flex;
 	justify-content: center;
 	align-items: center;
