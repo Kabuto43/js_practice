@@ -1,7 +1,6 @@
 const GOODS = [
     {
         name: 'Lessons HTML',
-        price: 300,
         imgSrc: 'goods/html.png',
     }, 
     {
@@ -13,11 +12,5 @@ const GOODS = [
         name: 'Lessons JS',
         price: 700,
         imgSrc: 'goods/js.png',
-    }, 
-    {
-        name: 'Lessons JS2',
-        price: 740,
-        imgSrc: 'goods/js.png',
-    }, 
-    
+    },
 ]

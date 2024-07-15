@@ -17,11 +17,6 @@ const tabWithCounter = document.querySelector(
 const tabs = document.querySelectorAll('button.tab');
 addClickListeners(tabs, clickHandler)
 
-const addInCartButtons = document.querySelectorAll(
-    'button[data-add-in-cart="true"]'
-);
-addClickListeners(addInCartButtons, addInCartHandler)
-
 // ---
 
 function clickHandler(event) {
@@ -36,12 +31,12 @@ function clickHandler(event) {
     renderTabContentById(activeTabId);
 }
 
-function addInCartHandler (event) {
-    const product = createProduct();
-    goodsInCart.push(product)
-
-    tabWithCounter.dataset.goodsCount = goodsInCart.length;
-    console.dir(goodsInCart)
+function addInCartHandler (product) {
+	return () => {
+		goodsInCart.push(product)
+	
+		tabWithCounter.dataset.goodsCount = goodsInCart.length;
+	};
 }
 
 function addClickListeners (elements, callback) {
@@ -52,11 +47,12 @@ function addClickListeners (elements, callback) {
     }
 }
 
-function createProduct () {
+function createProduct (product) {
     return {
-        name: 'HTML lessons',
-        price: 500,
-    };
+		name: product.name ? product.name : "Name is unknown",
+		price: product.price ? product.price : null,
+		imgSrc: product.imgSrc ? product.imgSrc : 'goods/default.png',
+	};
 }
 
 function getActiveTab () {
@@ -83,6 +79,41 @@ function renderTabContentById (tabId) {
     }
 }
 
+function renderGoods () {
+	const div = document.createElement('div');
+	div.dataset.activeTabContent = 'true';
+	div.className = 'product-items';
+
+	for (let i = 0; i < GOODS.length; i++) {
+		const product = createProduct(GOODS[i]);
+
+		const button = document.createElement('button');
+		button.className = 'button';
+		button.textContent = 'В корзину';
+		
+		button.addEventListener('click', addInCartHandler(product))
+
+		const price = product.price === null
+			? '<p>Out of stock</p>'
+			: `<p class="price">$ ${product.price}</p>`;
+
+		const productBlock = document.createElement('div');
+		productBlock.className = 'product-item'
+		productBlock.innerHTML = `
+			<img src="${product.imgSrc}">
+			<div class="product-list">
+				<h3>${product.name}</h3>
+				${price}
+			</div>
+		`;
+
+		productBlock.querySelector('.product-list').append(button);
+		div.append(productBlock)
+    }
+
+	return div;
+}
+
 function renderCart () {
     return `
     <div data-active-tab-content="true" class="cart-items">
@@ -105,27 +136,4 @@ function renderCart () {
 		</div>
 	</div>
     `;
-}
-
-function renderGoods () {
-	const div = document.createElement('div');
-	div.dataset.activeTabContent = 'true';
-	div.className = 'product-items';
-
-	for (let i = 0; i < GOODS.length; i++) {
-        const product = GOODS[i];
-
-		div.insertAdjacentHTML('beforeend', `
-			<div class="product-item">
-				<img src="${product.imgSrc}">
-				<div class="product-list">
-					<h3>${product.name}</h3>
-					<p class="price">${product.price}</p>
-					<button data-add-in-cart="true" class="button">В корзину</button>
-				</div>
-			</div>
-		`)
-    }
-
-	return div;
 }
