@@ -73,14 +73,14 @@ function removeActiveTabContent () {
 
 function renderTabContentById (tabId) {
     const tabsContainer = document.querySelector('.tabs');
-    let html = '';
 
     if (tabId === 'goods') {
-        html = renderGoods();
+        const html = renderGoods();
+		tabsContainer.after(html)
     } else {
-        html = renderCart();
+        const html = renderCart();
+		tabsContainer.insertAdjacentHTML('afterend', html);
     }
-    tabsContainer.insertAdjacentHTML('afterend', html);
 }
 
 function renderCart () {
@@ -108,34 +108,24 @@ function renderCart () {
 }
 
 function renderGoods () {
-    return `
-    <div data-active-tab-content="true" class="product-items">
-		<div class="product-item">
-			<img src="goods/html.png">
-			<div class="product-list">
-				<h3>Уроки по HTML</h3>
-				<p class="price">₽ 300</p>
-				<button data-add-in-cart="true" class="button">В корзину</button>
-			</div>
-		</div>
+	const div = document.createElement('div');
+	div.dataset.activeTabContent = 'true';
+	div.className = 'product-items';
 
-		<div class="product-item">
-			<img src="goods/css.png">
-			<div class="product-list">
-				<h3>Уроки по CSS</h3>
-				<p class="price">₽ 150</p>
-				<button data-add-in-cart="true" class="button">В корзину</button>
-			</div>
-		</div>
+	for (let i = 0; i < GOODS.length; i++) {
+        const product = GOODS[i];
 
-		<div class="product-item">
-			<img src="goods/js.png">
-			<div class="product-list">
-				<h3>Уроки по JS</h3>
-				<p class="price">₽ 260</p>
-				<button data-add-in-cart="true" class="button">В корзину</button>
+		div.insertAdjacentHTML('beforeend', `
+			<div class="product-item">
+				<img src="${product.imgSrc}">
+				<div class="product-list">
+					<h3>${product.name}</h3>
+					<p class="price">${product.price}</p>
+					<button data-add-in-cart="true" class="button">В корзину</button>
+				</div>
 			</div>
-		</div>
-	</div>
-    `;
+		`)
+    }
+
+	return div;
 }
