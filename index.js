@@ -1,4 +1,12 @@
-let activeTabId = 'goods';
+let activeTabId = 'cart';
+
+const goodsInCart = [
+	{
+		name : "test",
+		price : 500,
+		imgSrc : 'goods/css.png'
+	},
+];
 
 const initialTab = getActiveTab();
 
@@ -8,7 +16,6 @@ renderTabContentById(activeTabId);
 
 // ---
 
-const goodsInCart = [];
 
 const tabWithCounter = document.querySelector(
     'button[data-goods-count]'
@@ -69,14 +76,17 @@ function removeActiveTabContent () {
 
 function renderTabContentById (tabId) {
     const tabsContainer = document.querySelector('.tabs');
+	let html = null;
 
     if (tabId === 'goods') {
-        const html = renderGoods();
-		tabsContainer.after(html)
+        html = renderGoods();
     } else {
-        const html = renderCart();
-		tabsContainer.insertAdjacentHTML('afterend', html);
+        html = renderCart();
     }
+
+	if (html !== null) {
+		tabsContainer.after(html)
+	}
 }
 
 function renderGoods () {
@@ -86,12 +96,6 @@ function renderGoods () {
 
 	for (let i = 0; i < GOODS.length; i++) {
 		const product = createProduct(GOODS[i]);
-
-		const button = document.createElement('button');
-		button.className = 'button';
-		button.textContent = 'В корзину';
-		
-		button.addEventListener('click', addInCartHandler(product))
 
 		const price = product.price === null
 			? '<p>Out of stock</p>'
@@ -107,7 +111,17 @@ function renderGoods () {
 			</div>
 		`;
 
-		productBlock.querySelector('.product-list').append(button);
+		if (product.price !== null) {
+			const clickHandler = addInCartHandler(product);
+
+			const button = document.createElement('button');
+			button.className = 'button';
+			button.textContent = 'В корзину';
+			button.addEventListener('click', clickHandler)
+
+			productBlock.querySelector('.product-list').append(button);
+		}
+
 		div.append(productBlock)
     }
 
@@ -115,25 +129,32 @@ function renderGoods () {
 }
 
 function renderCart () {
-    return `
-    <div data-active-tab-content="true" class="cart-items">
-		<div class="cart-item">
-			<div class="cart-item-title">Уроки по HTML</div>
+	const container = document.createElement('div');
+	container.dataset.activeTabContent = 'true';
+	container.className = "cart-items";
+
+	for (let i = 0; i < goodsInCart.length; i++) {
+		const product = goodsInCart[i];
+
+		const cartItem = document.createElement('div');
+		cartItem.className = 'cart-item';
+		cartItem.innerHTML = `
+			<div class="cart-item-title">${product.name}</div>
 			<div class="cart-item-count">3шт.</div>
-			<div class="cart-item-price">₽ 150</div>
-		</div>
+			<div class="cart-item-price">${product.price}</div>
+		`;
 
-		<div class="cart-item">
-			<div class="cart-item-title">Уроки по CSS</div>
-			<div class="cart-item-count">1шт.</div>
-			<div class="cart-item-price">₽ 450</div>
-		</div>
+		const button = document.createElement('button');
+		button.className = 'cart-item-delete';
+		button.style.cssText = `
+			padding-bottom: 5px;
+		`
+		button.textContent = 'x';
 
-		<div class="cart-item">
-			<div class="cart-item-title">Уроки по JS</div>
-			<div class="cart-item-count">6шт.</div>
-			<div class="cart-item-price">₽ 550</div>
-		</div>
-	</div>
-    `;
+		cartItem.append(button);
+
+		container.append(cartItem);
+	}
+
+	return container;
 }
