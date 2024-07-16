@@ -1,12 +1,6 @@
 let activeTabId = 'cart';
 
-const goodsInCart = [
-	{
-		name : "test",
-		price : 500,
-		imgSrc : 'goods/css.png'
-	},
-];
+let goodsInCart = [];
 
 const initialTab = getActiveTab();
 
@@ -40,10 +34,79 @@ function clickHandler(event) {
 
 function addInCartHandler (product) {
 	return () => {
-		goodsInCart.push(product)
-	
-		tabWithCounter.dataset.goodsCount = goodsInCart.length;
+		let hasProduct = false;
+		let index = null;
+		let count = 1;
+
+		for (let i = 0; i < goodsInCart.length; i++){
+			const productInCart = goodsInCart[i];
+
+			if (product.id === productInCart.id) {
+				hasProduct = true;
+				index = i;
+				count = productInCart.count
+			}
+		}
+
+		if (hasProduct) {
+			goodsInCart[index].count++;
+		} else {
+			productWithCount = product;
+			productWithCount.count = count;
+			goodsInCart.push(product)
+		}
+
+		tabWithCounter.dataset.goodsCount = fullSizeCounter();
 	};
+}
+
+function fullSizeCounter () {
+	let fullSize = 0;
+
+		for (let i = 0; i < goodsInCart.length; i++){
+			const productInCart = goodsInCart[i];
+			fullSize += productInCart.count;
+		}
+
+		return fullSize;
+}
+
+function removeInCartHandler (productId) {
+	return () => {
+		const newGoodsInCart = [];
+
+		for (let i = 0; i < goodsInCart.length; i++) {
+			const product = goodsInCart[i];
+
+			if (productId === product.id) {
+				if (product.count > 1) {
+					newGoodsInCart.push({
+						id: product.id,
+						name: product.name,
+						price: product.price,
+						imgSrc: product.imgSrc,
+						count: product.count - 1
+					});
+				}
+
+				updateCartItem(product.id, product.count);
+			} 
+			else {
+				newGoodsInCart.push(product);
+			}
+		}
+
+		goodsInCart = newGoodsInCart;
+
+		let fullSize = 0;
+
+		for (let i = 0; i < goodsInCart.length; i++){
+			const productInCart = goodsInCart[i];
+			fullSize += productInCart.count;
+		}
+
+		tabWithCounter.dataset.goodsCount = fullSizeCounter();
+	}
 }
 
 function addClickListeners (elements, callback) {
@@ -56,6 +119,7 @@ function addClickListeners (elements, callback) {
 
 function createProduct (product) {
     return {
+		id: product.id,
 		name: product.name ? product.name : "Name is unknown",
 		price: product.price ? product.price : null,
 		imgSrc: product.imgSrc ? product.imgSrc : 'goods/default.png',
@@ -138,18 +202,23 @@ function renderCart () {
 
 		const cartItem = document.createElement('div');
 		cartItem.className = 'cart-item';
+		cartItem.dataset.elementId = product.id;
 		cartItem.innerHTML = `
 			<div class="cart-item-title">${product.name}</div>
-			<div class="cart-item-count">3шт.</div>
+			<div class="cart-item-count">${product.count} шт.</div>
 			<div class="cart-item-price">${product.price}</div>
 		`;
+
+		const clickHandler = removeInCartHandler(product.id);
 
 		const button = document.createElement('button');
 		button.className = 'cart-item-delete';
 		button.style.cssText = `
+			cursor: pointer;
 			padding-bottom: 5px;
 		`
 		button.textContent = 'x';
+		button.addEventListener('click', clickHandler)
 
 		cartItem.append(button);
 
@@ -157,4 +226,15 @@ function renderCart () {
 	}
 
 	return container;
+}
+
+function updateCartItem (id, count) {
+	const cartItem = document.querySelector(`[data-element-id="${id}"]`)
+
+	if (count > 1) {
+		const countElement = cartItem.querySelector('.cart-item-count');
+		countElement.textContent = `${count - 1} шт.`;
+	} else {
+		cartItem.remove();
+	}
 }

@@ -134,3 +134,10 @@ body {
 	border-radius: 5px;
 	width: 30px;
 }
+
+.cart-item-delete:hover {
+	background: rgba(250, 31, 31, 0.8);
+}
+.cart-item-delete:active {
+	background: rgb(151, 8, 8);
+}
